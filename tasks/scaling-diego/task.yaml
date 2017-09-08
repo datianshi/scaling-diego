@@ -8,7 +8,7 @@ image_resource:
 inputs:
   - name: scaling-diego
 params:
-  OPSMAN_USER:
+  OPSMAN_USERNAME:
   OPSMAN_PASSWORD:
   OPSMAN_DOMAIN_OR_IP_ADDRESS:
   DIEGO_CELL_INSTANCES:
