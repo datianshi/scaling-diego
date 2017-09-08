@@ -13,8 +13,8 @@ cf_resources=$(
 
 om-linux \
   --target https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
-  --username $OPS_MGR_USR \
-  --password $OPS_MGR_PWD \
+  --username $OPSMAN_USERNAME \
+  --password $OPSMAN_PASSWORD \
   --skip-ssl-validation \
   configure-product \
   --product-name cf \
