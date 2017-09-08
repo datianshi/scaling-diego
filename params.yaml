@@ -1,0 +1,5 @@
+pivnet_token: 5aQ85hGwstBKiTGQ_wVD
+opsman_admin_username: admin
+opsman_admin_password: admin
+opsman_domain_or_ip_address: 10.193.63.120
+diego_cell_instances: 5

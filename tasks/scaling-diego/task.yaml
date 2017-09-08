@@ -1,0 +1,16 @@
+---
+platform: linux
+
+image_resource:
+  type: docker-image
+  source:
+    repository: czero/cflinuxfs2
+inputs:
+  - name: scaling-diego
+params:
+  OPSMAN_USER:
+  OPSMAN_PASSWORD:
+  OPSMAN_DOMAIN_OR_IP_ADDRESS:  
+  DIEGO_CELL_INSTANCES:
+run:
+  path: scaling-diego/tasks/scaling-diego/task.sh
