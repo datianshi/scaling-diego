@@ -10,7 +10,7 @@ inputs:
 params:
   OPSMAN_USER:
   OPSMAN_PASSWORD:
-  OPSMAN_DOMAIN_OR_IP_ADDRESS:  
+  OPSMAN_DOMAIN_OR_IP_ADDRESS:
   DIEGO_CELL_INSTANCES:
 run:
   path: scaling-diego/tasks/scaling-diego/task.sh
