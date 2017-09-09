@@ -11,6 +11,8 @@ cf_resources=$(
     '
 )
 
+echo $cf_resources
+
 om-linux \
   --target https://$OPSMAN_DOMAIN_OR_IP_ADDRESS \
   --username $OPSMAN_USERNAME \

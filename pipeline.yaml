@@ -1,3 +1,11 @@
+groups:
+- name: scale-up
+  jobs:
+  - scale-up
+- name: scale-down
+  jobs:
+  - scale-down
+
 resource_types:
 - name: pivnet
   type: docker-image
@@ -19,8 +27,22 @@ resources:
     product_slug: pcf-automation
     product_version: v0.16.0
 
+- name: after-midnight
+  type: time
+  source:
+    start: 12:00 AM
+    stop: 12:30 AM
+    location: America/Los_Angeles
+
+- name: after-morning
+  type: time
+  source:
+    start: 06:00 AM
+    stop: 06:30 AM
+    location: America/Los_Angeles
+
 jobs:
-- name: scale
+- name: scale-up
   plan:
   - aggregate:
     - do:
@@ -45,6 +67,7 @@ jobs:
           - name: pcf-pipelines
             path: ""
     - get: scaling-diego
+    - get: after-morning
       trigger: true
   - task: wait-opsman-clear
     file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
@@ -58,4 +81,57 @@ jobs:
       OPSMAN_USERNAME: {{opsman_admin_username}}
       OPSMAN_PASSWORD: {{opsman_admin_password}}
       OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
-      DIEGO_CELL_INSTANCES: {{diego_cell_instances}}
+      DIEGO_CELL_INSTANCES: {{scale_up_instances}}
+  - task: apply-changes
+    file: pcf-pipelines/tasks/apply-changes/task.yml
+    params:
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+
+- name: scale-down
+  plan:
+  - aggregate:
+    - do:
+      - get: pcf-pipelines-tarball
+      - task: unpack-tarball
+        config:
+          platform: linux
+          image_resource:
+            type: docker-image
+            source:
+              repository: czero/cflinuxfs2
+          run:
+            path: bash
+            args:
+            - -c
+            - tar -xvf pcf-pipelines-tarball/*.tgz
+            dir: ""
+          inputs:
+          - name: pcf-pipelines-tarball
+            path: ""
+          outputs:
+          - name: pcf-pipelines
+            path: ""
+    - get: scaling-diego
+    - get: after-midnight
+      trigger: true
+  - task: wait-opsman-clear
+    file: pcf-pipelines/tasks/wait-opsman-clear/task.yml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+  - task: config-diego-instances
+    file: scaling-diego/tasks/scaling-diego/task.yaml
+    params:
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+      DIEGO_CELL_INSTANCES: {{scale_down_instances}}
+  - task: apply-changes
+    file: pcf-pipelines/tasks/apply-changes/task.yml
+    params:
+      OPSMAN_DOMAIN_OR_IP_ADDRESS: {{opsman_domain_or_ip_address}}
+      OPSMAN_USERNAME: {{opsman_admin_username}}
+      OPSMAN_PASSWORD: {{opsman_admin_password}}
